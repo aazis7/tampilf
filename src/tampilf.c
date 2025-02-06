@@ -27,7 +27,8 @@
  * @param str Pointer to the string to be written.
  * @param len The length of the string to be written.
  */
-static void sys_write(const char *str, int len) {
+static void sys_write(const char *str, int len)
+{
   write(STDOUT_FILENO, str, len);
 }
 
@@ -45,33 +46,39 @@ static void sys_write(const char *str, int len) {
  * @param is_upper Flag indicating whether the hexadecimal should be uppercase.
  */
 static void int_to_str(long long num, char *buf, int base, int is_unsigned,
-                       int is_upper) {
+                       int is_upper)
+{
   const char *digits = is_upper ? "0123456789ABCDEF" : "0123456789abcdef";
-  int i = 0, is_neg = 0;
+  int         i = 0, is_neg = 0;
 
-  if (!is_unsigned && num < 0) {
+  if (!is_unsigned && num < 0)
+  {
     is_neg = 1;
-    num = -num;
+    num    = -num;
   }
 
-  if (num == 0) { // Special case for zero
+  if (num == 0)
+  { // Special case for zero
     buf[i++] = '0';
-  } else {
-    do {
+  }
+  else
+  {
+    do
+    {
       buf[i++] = digits[num % base];
       num /= base;
     } while (num);
   }
 
-  if (is_neg)
-    buf[i++] = '-';
+  if (is_neg) buf[i++] = '-';
 
   buf[i] = '\0';
 
   // Reverse the string to get the correct order
-  for (int j = 0; j < i / 2; j++) {
-    char temp = buf[j];
-    buf[j] = buf[i - j - 1];
+  for (int j = 0; j < i / 2; j++)
+  {
+    char temp      = buf[j];
+    buf[j]         = buf[i - j - 1];
     buf[i - j - 1] = temp;
   }
 }
@@ -86,8 +93,9 @@ static void int_to_str(long long num, char *buf, int base, int is_unsigned,
  * @param buf The buffer to store the resulting string.
  * @param precision The number of decimal places to include.
  */
-static void float_to_str(double num, char *buf, int precision) {
-  int whole = (int)num;
+static void float_to_str(double num, char *buf, int precision)
+{
+  int    whole    = (int) num;
   double fraction = num - whole;
 
   // Convert integer part to string
@@ -96,22 +104,25 @@ static void float_to_str(double num, char *buf, int precision) {
 
   // Convert fractional part to string
   char frac_part[32];
-  for (int i = 0; i < precision; i++) {
+  for (int i = 0; i < precision; i++)
+  {
     fraction *= 10;
-    frac_part[i] = ((int)fraction % 10) + '0';
-    fraction -= (int)fraction;
+    frac_part[i] = ((int) fraction % 10) + '0';
+    fraction -= (int) fraction;
   }
   frac_part[precision] = '\0';
 
   // Join integer part and fractional part
   int i = 0;
-  while (int_part[i]) {
+  while (int_part[i])
+  {
     buf[i] = int_part[i];
     i++;
   }
   buf[i++] = '.';
-  int j = 0;
-  while (frac_part[j]) {
+  int j    = 0;
+  while (frac_part[j])
+  {
     buf[i++] = frac_part[j++];
   }
   buf[i] = '\0';
@@ -127,14 +138,12 @@ static void float_to_str(double num, char *buf, int precision) {
  * @return The ANSI escape sequence for the color, or an empty string if the
  * color is unknown.
  */
-static const char *get_color_code(const char *color) {
-  if (strcmp(color, "red") == 0)
-    return "\033[31m"; // Red
-  if (strcmp(color, "green") == 0)
-    return "\033[32m"; // Green
-  if (strcmp(color, "blue") == 0)
-    return "\033[34m"; // Blue
-  return "";           // No color
+static const char *get_color_code(const char *color)
+{
+  if (strcmp(color, "red") == 0) return "\033[31m";   // Red
+  if (strcmp(color, "green") == 0) return "\033[32m"; // Green
+  if (strcmp(color, "blue") == 0) return "\033[34m";  // Blue
+  return "";                                          // No color
 }
 
 /**
@@ -150,28 +159,35 @@ static const char *get_color_code(const char *color) {
  * @param output The output buffer where the formatted string is stored.
  * @param output_len The current length of the output buffer.
  */
-void process_color(const char **format, char *output, int *output_len) {
-  if (**format == '{') {
+void process_color(const char **format, char *output, int *output_len)
+{
+  if (**format == '{')
+  {
     (*format)++; // Skip '{'
     char color[16];
-    int i = 0;
+    int  i = 0;
 
     // Read color name until '}' character
-    while (**format && **format != '}') {
-      if (i < sizeof(color) - 1) {
+    while (**format && **format != '}')
+    {
+      if (i < sizeof(color) - 1)
+      {
         color[i++] = **format;
       }
       (*format)++;
     }
     color[i] = '\0';
 
-    if (**format == '}') {
+    if (**format == '}')
+    {
       (*format)++; // Skip '}'
       const char *color_code = get_color_code(color);
-      if (color_code[0] != '\0') {
+      if (color_code[0] != '\0')
+      {
         // Apply color
         int color_len = strlen(color_code);
-        if (*output_len + color_len < 1024) { // Ensure buffer doesn't overflow
+        if (*output_len + color_len < 1024)
+        { // Ensure buffer doesn't overflow
           memcpy(output + (*output_len), color_code, color_len);
           *output_len += color_len;
         }
@@ -191,126 +207,154 @@ void process_color(const char **format, char *output, int *output_len) {
  * arguments.
  * @param ... The variable arguments that correspond to the format specifiers.
  */
-void tampilf(const char *format, ...) {
-  char output[1024]; // Ensure buffer size is sufficient
-  int output_len = 0;
+void tampilf(const char *format, ...)
+{
+  char    output[1024]; // Ensure buffer size is sufficient
+  int     output_len = 0;
   va_list args;
   va_start(args, format);
 
-  while (*format) {
+  while (*format)
+  {
     // Check for color formatting like {red}, {blue}, etc.
-    if (*format == '{') {
+    if (*format == '{')
+    {
       process_color(&format, output, &output_len);
-    } else if (*format == '%' && *(format + 1)) {
+    }
+    else if (*format == '%' && *(format + 1))
+    {
       format++; // Skip '%'
 
-      switch (*format) {
-      case 'c': { // Character
-        char c = (char)va_arg(args, int);
-        output[output_len++] = c;
-        break;
-      }
-
-      case 's': { // String
-        char *str = va_arg(args, char *);
-        while (*str) {
-          output[output_len++] = *str++;
+      switch (*format)
+      {
+        case 'c':
+        { // Character
+          char c               = (char) va_arg(args, int);
+          output[output_len++] = c;
+          break;
         }
-        break;
-      }
 
-      case 'd':
-      case 'i': { // Integer
-        int num = va_arg(args, int);
-        char buf[32];
-        int_to_str(num, buf, 10, 0, 0);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 's':
+        { // String
+          char *str = va_arg(args, char *);
+          while (*str)
+          {
+            output[output_len++] = *str++;
+          }
+          break;
         }
-        break;
-      }
 
-      case 'u': { // Unsigned integer
-        unsigned int num = va_arg(args, unsigned int);
-        char buf[32];
-        int_to_str(num, buf, 10, 1, 0);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'd':
+        case 'i':
+        { // Integer
+          int  num = va_arg(args, int);
+          char buf[32];
+          int_to_str(num, buf, 10, 0, 0);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      case 'f':   // Float
-      case 'l': { // Double
-        double num = va_arg(args, double);
-        char buf[64];
-        float_to_str(num, buf, 6);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'u':
+        { // Unsigned integer
+          unsigned int num = va_arg(args, unsigned int);
+          char         buf[32];
+          int_to_str(num, buf, 10, 1, 0);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      case 'x':
-      case 'X': { // Hexadecimal
-        unsigned int num = va_arg(args, unsigned int);
-        char buf[32];
-        int_to_str(num, buf, 16, 1, (*format == 'X'));
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'f': // Float
+        case 'l':
+        { // Double
+          double num = va_arg(args, double);
+          char   buf[64];
+          float_to_str(num, buf, 6);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      case 'o': { // Octal
-        unsigned int num = va_arg(args, unsigned int);
-        char buf[32];
-        int_to_str(num, buf, 8, 1, 0);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'x':
+        case 'X':
+        { // Hexadecimal
+          unsigned int num = va_arg(args, unsigned int);
+          char         buf[32];
+          int_to_str(num, buf, 16, 1, (*format == 'X'));
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      case 'b': { // Binary (special additional)
-        unsigned int num = va_arg(args, unsigned int);
-        char buf[32];
-        int_to_str(num, buf, 2, 1, 0);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'o':
+        { // Octal
+          unsigned int num = va_arg(args, unsigned int);
+          char         buf[32];
+          int_to_str(num, buf, 8, 1, 0);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      case 'p': { // Pointer
-        void *ptr = va_arg(args, void *);
-        unsigned long addr = (unsigned long)ptr;
-        char buf[32];
-        buf[0] = '0';
-        buf[1] = 'x';
-        int_to_str(addr, buf + 2, 16, 1, 0);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'b':
+        { // Binary (special additional)
+          unsigned int num = va_arg(args, unsigned int);
+          char         buf[32];
+          int_to_str(num, buf, 2, 1, 0);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      case 'z': { // size_t (also can %zu)
-        size_t num = va_arg(args, size_t);
-        char buf[32];
-        int_to_str(num, buf, 10, 1, 0);
-        for (int i = 0; buf[i]; i++) {
-          output[output_len++] = buf[i];
+        case 'p':
+        { // Pointer
+          void         *ptr  = va_arg(args, void *);
+          unsigned long addr = (unsigned long) ptr;
+          char          buf[32];
+          buf[0] = '0';
+          buf[1] = 'x';
+          int_to_str(addr, buf + 2, 16, 1, 0);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
         }
-        break;
-      }
 
-      default: { // If not recognized, print as is
-        output[output_len++] = '%';
-        output[output_len++] = *format;
+        case 'z':
+        { // size_t (also can %zu)
+          size_t num = va_arg(args, size_t);
+          char   buf[32];
+          int_to_str(num, buf, 10, 1, 0);
+          for (int i = 0; buf[i]; i++)
+          {
+            output[output_len++] = buf[i];
+          }
+          break;
+        }
+
+        default:
+        { // If not recognized, print as is
+          output[output_len++] = '%';
+          output[output_len++] = *format;
+        }
       }
-      }
-    } else {
+    }
+    else
+    {
       output[output_len++] = *format;
     }
 
@@ -327,4 +371,7 @@ void tampilf(const char *format, ...) {
   va_end(args);
 }
 
-int main(void) { tampilf("hello, world!\n"); }
+int main(void)
+{
+  tampilf("hello, world!\n");
+}

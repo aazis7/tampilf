@@ -1,5 +1,6 @@
 #ifndef TAMPILF_H
 #define TAMPILF_H
+#include "pindaif.h"
 
 /**
  * @file tampilf.h

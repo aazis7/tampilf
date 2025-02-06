@@ -5,8 +5,8 @@ CC=gcc
 CFLAGS="-Wall -Wextra"
 
 # Source, header, object files, static and dynamic libraries, and binary
-SOURCE="src/tampilf.c"
-HEADER="src/tampilf.h"
+SOURCE="src/tampilf.c src/pindaif.c"
+HEADER="src/tampilf.h src/pindaif.h"
 OBJECT="build/tampilf.o"
 LIBRARY="build/libtampilf.a"    # Static library file name
 LIBRARY_SO="build/libtampilf.so" # Dynamic library file name (optional)
