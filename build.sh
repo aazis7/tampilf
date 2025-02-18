@@ -13,8 +13,8 @@ LIBRARY_SO="build/libtampilf.so" # Dynamic library file name (optional)
 BIN="bin/tampilf"                # Executable binary name
 
 # Installation locations for library and headers
-PREFIX_LIB="/data/data/com.termux/files/usr/lib" # Set your desired location (e.g., $PREFIX)
-PREFIX_INCLUDE="/data/data/com.termux/files/usr/include" # Set your desired location (e.g., $PREFIX)
+PREFIX_LIB="/usr/lib" # Set your desired location (e.g., $PREFIX)
+PREFIX_INCLUDE="/usr/include" # Set your desired location (e.g., $PREFIX)
 
 # Create necessary directories if they don't exist
 mkdir -p build bin
